@@ -1,0 +1,84 @@
+.transition(@val 0.5) {
+  -webkit-transition: @val;
+  -o-transition: @val;
+  transition: @val;
+}
+
+.borderRadius(@r 2px) {
+  -webkit-border-radius: @r;
+  -moz-border-radius: @r;
+  border-radius: @r;
+}
+
+
+
+.padding-left(@length) {
+  // создаем примесь с параметром
+  padding-left:  ~"calc(@{koaf} + @{length})";
+}
+
+.titleHeader(@size: 45px) {
+  text-align: center;
+  opacity: 0.8;
+  font-family: "Open Sans";
+  font-size: @size;
+  font-weight: 600;
+  line-height: 45.74px;
+  margin-bottom: 20px;
+
+  &_color {
+    color: #fc6744;
+  }
+}
+
+.textHeader() {
+  text-align: center;
+  opacity: 0.5;
+  font-family: "Open Sans";
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 25px;
+  margin-bottom: 49px;
+}
+
+.titleTextHeader(@title: 45px; @text: 16px) {}
+
+
+.buttonWhite() {
+  box-shadow: 2px 11px 20px rgba(20, 20, 21, 0.08);
+  border-radius: 27px;
+  border: 1px solid rgba(1, 2, 2, 0.07);
+  background-color: #ffffff;
+  margin-bottom: -80px;
+  padding: 10px 50px;
+
+  &:hover {
+    border: 1px solid rgba(214, 108, 104, 0.5);
+    background-color: #e6e6e6;
+  }
+}
+
+.flatButton(@bgcolor: #ff6e47; @fontcolor: #fff) {
+  box-shadow: 2px 11px 20px rgba(20, 20, 21, 0.07);
+  -webkit-box-shadow:2px 11px 20px rgba(20, 20, 21, 0.07);
+  -moz-box-shadow:2px 11px 20px rgba(20, 20, 21, 0.07);
+  border-radius: 27px;
+  border: 1px solid rgba(1, 2, 2, 0.07);
+  transition: 0.5s;
+  .hover-focus(@bgcolor,@fontcolor)
+}
+
+.hover-focus(@bgcolor: #ff6e47; @fontcolor: #fff) {
+
+  &:hover,
+  &:focus {
+    background-color: @bgcolor;
+    color: @fontcolor;
+    cursor: pointer;
+    -webkit-box-shadow: 0px 0px 55px 2px rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: 0px 0px 55px 2px rgba(0, 0, 0, 0.25);
+    box-shadow: 0px 0px 55px 2px rgba(0, 0, 0, 0.25);
+  }
+}
+
+

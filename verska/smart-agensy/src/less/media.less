@@ -1,0 +1,78 @@
+@desktopWidth            : 1280px;
+@smDesktopWidth          : 980px;
+@tableWidth              : 768px;
+@phoneWidth              : 480px;
+@smPhoneWidth            : 320px;
+
+@koaf:0px;
+@media (max-width: @desktopWidth) {
+    @koaf:0px;
+  }
+  @media (max-width: @smDesktopWidth) {
+    @koaf:1px;
+  }
+  @media (max-width: @tableWidth) {
+    @koaf:2px;
+  }
+  @media (max-width: @phoneWidth) {
+    @koaf:3px;
+  }
+
+  @media (max-width: @smPhoneWidth) {
+    @koaf:4px;
+  }
+
+  @media (max-width: 1114px) {
+    .team__items {
+      justify-content: space-around;
+      
+    }
+    .team__item:nth-child(1) {
+      order: 1;
+    }
+    .team__item:nth-child(2) {
+      order: 2;
+    }
+    .team__item:nth-child(3) {
+      order: 1;
+    }
+  
+  }
+
+  @media (max-width: 952px) {
+
+    .services__buttons  {
+      flex-direction: row;
+      justify-content: space-between;
+      margin-right:1vw;
+      margin:0;
+
+      flex-wrap: nowrap;
+    }
+    .services__slider {
+      margin:0;
+      flex-direction: column;
+      justify-content: center;
+      flex-wrap: nowrap;
+     
+    }
+  
+  }
+
+  @media (max-width:   700px) {
+    .slide__modern {
+      flex-direction: column-reverse;
+    }
+    .modern__text  {
+      max-width: 100%;
+      min-width: 0;
+      
+    }
+    .modern__title {
+      text-align: center;
+    }
+    .modern__button{
+      margin: 0 auto;
+    }
+    }
+

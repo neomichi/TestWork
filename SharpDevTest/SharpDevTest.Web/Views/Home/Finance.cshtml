@@ -1,0 +1,148 @@
+﻿@{
+    ViewData["Title"] = "Лк";
+}
+@model SharpDevTest.Web.ViewModels.HistoryTransactionView
+    <link href="~/lib/kendo/css/kendo.default.min.css" rel="stylesheet" />
+    <link href="~/lib/kendo/css/kendo.common.min.css" rel="stylesheet" />
+    <div class="row">
+
+        <div class="col-xs-4 col-md-3">
+            <h2>@Model.FromUser.FirstName @Model.FromUser.LastName</h2>
+
+            <h4>Балланс : <b> @Model.FromUser.Purse</b></h4>
+
+            <form action="" method="post">
+                <input name="Id" type="hidden" value="@Model.FromUser.Id" />
+                <div class="form-group">
+                    <label asp-for="Summ"></label>
+                    <input asp-for="Summ" class="form-control" />
+                    <span asp-validation-for="Summ" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="RecipientId"></label>
+                    <select asp-for="RecipientId" asp-items="@Model.ListItems" class="form-control"></select>
+                    <span asp-validation-for="RecipientId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-default">отправить</button>
+                </div>
+            </form>
+        </div>
+
+        <div style="margin-left: 10px;float: right !important;" class="col-xs-7 col-sm-8">
+            <h2>Список транзакций</h2>
+            <div id="grid" style="border: 1px solid #000000"></div>
+
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+
+
+    @section Scripts {
+
+        <script src="~/lib/select2/select2.js"></script>
+        <script src="~/lib/select2/ru.js"></script>
+
+
+        <script src="~/lib/kendo/kendo.web.min.js"></script>
+        <script src="~/lib/kendo/kendo.ru-RU.js"></script>
+        <script src="~/lib/kendo/kendo.culture.ru-RU.min.js"></script>
+        <script src="~/lib/kendo/kendo.culture.ru.min.js"></script>
+
+        <script>
+            function repeat(el) {              
+                $.post("/Home/RepeatTransactionId", { Id: $(el).attr("Id") }, function (data) {
+                    $("#RecipientId").val(data.id);                    
+                    $("#Summ").val(data.summ);                    
+                });
+            }
+
+            $(function () {
+                //$.ajax({
+                //    url: "Autocomplete",
+                //    cache: false
+                //})
+                //    .done(function (json) {
+                //        $("#results").append(html);
+                //        console.log(html);
+                //    });
+
+                //$('#Recipient').typeahead({
+                //    name: 'search2',
+                //    remote: {
+                //        url: '/autocomplete?query=%QUERY',
+                //        dataType: 'json',
+                //        cache: false,
+                //        filter: function (parsedResponse) {
+                //            return parsedResponse;
+                //        }
+                //    }
+                //})
+                //    .on('typeahead:selected', function (e) {
+
+                //    });
+            
+                $.post("/Home/GetHistoryLog", function (data) {                
+                
+                kendo.culture("ru-RU");
+                $("#grid").kendoGrid({
+                    dataSource: {
+                        data: data,
+                        schema: {
+                            model: {
+                                fields: {
+                                    Selected: { type: "boolean" },
+                                    id: { type: "string", editable: false },
+                                    recipientId: { type: "string", editable: false },
+                                    recipientFio: { type: "string", editable: false },
+                                    summ: { type: "number", editable: false },
+                                    createdDate: { type: "string", editable: false },
+                                }
+                            }
+                        },
+                        pageSize: 5
+                    },
+
+                    scrollable: true,
+                    selectable: false,
+                    sortable: true,
+                    filterable: {
+                        extra: false,
+                        operators: {
+                            string: {
+                                startswith: "начинается с",
+                                neq: "не содержит"
+                            }
+                        }
+                    },
+                    pageable: {
+                        input: true,
+                        numeric: true,
+                        refresh: true,
+                        pageSizes: true,
+                        buttonCount: 10
+
+                    },
+                    sort: {
+                        field: "createdDate",
+                        dir: "desc"
+                    },
+                    columns: [
+                        { field: "id", title: "Транзация", width: "12%" },
+                        { field: "recipientFio ", title: "Получатель", width: "12%" },
+                        { field: "summ", title: "Сумма", width: "12%" },
+                        { field: "createdDate", title: "Дата", width: "12%" },
+                        { field: "id", title: " ", width: "12%", template: '<button id="#=id#" class="btn btn-info" onclick="repeat(this);" >повторить </button>' },
+
+                    ], editable: false
+                  
+                    });
+                });
+            });
+             
+
+           
+
+
+        </script>
+    }

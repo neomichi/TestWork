@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<doc>
+  <assembly>
+    <name>BrokereeSolution.Api</name>
+  </assembly>
+  <members>
+    <member name="M:BrokereeSolution.Api.Controllers.ItemController.GetAll">
+      <summary>
+        получить все items
+      </summary>
+      <remarks>
+        Получить список всех ресурсов
+      </remarks>
+      <returns>все items</returns>
+    </member>    
+    <member name="M:BrokereeSolution.Api.Controllers.ItemController.GetById">
+      <summary>
+        получить item
+      </summary>
+      <remarks>
+        Получить ресурс по id
+      </remarks>
+      <param name="id">идентификатор item</param>
+      <returns>указанный item если существует</returns>
+    </member>
+    <member name="M:BrokereeSolution.Api.Controllers.ItemController.GetByMany">
+      <summary>
+        получить все items
+      </summary>
+      <returns></returns>
+    </member>
+    <member name="M:BrokereeSolution.Api.Controllers.ItemController.Post">
+      <summary>
+        получить все items
+      </summary>
+      <returns></returns>
+    </member>
+  </members>
+</doc>

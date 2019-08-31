@@ -1,0 +1,150 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@using System.Threading.Tasks
+@using Web.Code
+@model Web.ViewModel.TradeView
+
+<div class="row">
+    <div class="col-md-5">
+        <form asp-route="AddOrder" style="border: 1px #000 solid; padding: 0 20px;">
+            <h4>купить</h4>
+            <hr />
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Price"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Amount"></label>
+                <input asp-for="Amount" class="form-control" />
+                <span asp-validation-for="Amount" class="text-danger" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Comment"></label>
+                <input asp-for="Comment" class="form-control" />
+                <span asp-validation-for="Comment" class="text-danger" />
+
+            </div>
+
+            <input name="ActionType" value="@(Constant.ActionType.Buy)" type="hidden" />
+
+            <div class="form-group">
+
+                <input type="submit" value="добавить" class="btn btn-default" />
+
+            </div>
+
+        </form>
+        <hr />
+
+        <table class="table table-bordered table-hover table-striped" style="margin-top: 10px">
+            <thead>
+                <tr>
+                    <th>цена</th>
+                    <th>Кол-во</th>
+                    <th>Коммент</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.BuyOrders)
+            {
+                    <tr>
+                        <td>@order.Price</td>
+                        <td>@order.Amount</td>
+                        <td>@order.Comment</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+    <div class="col-md-offset-2 col-md-5">
+        <form asp-route="AddOrder" style="border: 1px #000 solid; padding: 0 20px;">
+            <h4>продать</h4>
+            <hr />
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Price"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Amount"></label>
+                <input asp-for="Amount" class="form-control" />
+                <span asp-validation-for="Amount" class="text-danger" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Comment"></label>
+                <input asp-for="Comment" class="form-control" />
+                <span asp-validation-for="Comment" class="text-danger" />
+
+            </div>
+
+            <input name="ActionType" value="@(Constant.ActionType.Sell)" type="hidden" />
+
+            <div class="form-group">
+
+                <input type="submit" value="добавить" class="btn btn-default" />
+
+            </div>
+
+        </form>
+        <hr />
+
+        <table class="table table-bordered table-hover table-striped" style="margin-top: 10px">
+            <thead>
+                <tr>
+                    <th>цена</th>
+                    <th>Кол-во</th>
+                    <th>Коммент</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.SellOrders)
+            {
+                <tr>
+                    <td>@order.Price</td>
+                    <td>@order.Amount</td>
+                    <td>@order.Comment</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<div class="col-md-12">
+    <h4>Завершенные сделки</h4>
+    <table class="table table-bordered table-hover table-striped" style="margin-top: 10px">
+        <thead>
+        <tr>
+            <th>выполненно</th>
+            <th>дата к</th>
+            <th>дата п</th>
+            <th>цена</th>
+            <th>кол-во</th>
+            <th>коммент К</th>
+            <th>коммент П</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model.CompleteTrades)
+        {
+            <tr>
+                <td>@item.CompleteAt</td>
+                <td>@item.BuyTime</td>
+                <td>@item.SellTime</td>
+                <td>@item.Price</td>
+                <td>@item.Amount</td>
+                <td>@item.BuyComment</td>
+                <td>@item.SellComment</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

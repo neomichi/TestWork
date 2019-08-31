@@ -1,0 +1,84 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    @model List<FastFood.Web.ModelView.FinalView>
+@using FastFood.Web.Models.Enum;
+}
+
+
+<div class="container">
+    <div class="row" style="display:flex;justify-content:center;">
+        @foreach (var item in Model)
+        {
+            <div class="card offset-md-1 col-12 col-sm-5 col-md-5 col-lg-5" style="@(item.CategoryType==CategoryType.ComplexFod?"":"")">
+                <div class="card-body">
+                    <h3 class="card-title">@item.CategoryTitle</h3>
+                    <hr />
+                    @foreach (var food in item.foodList.Select((x, i) => new { Value = x, Index = i }))
+                    {
+                        <div class="form-check row">
+                            <div class="col-12" data-max="@food.Value.Filter.MaxCount" data-money="@(food.Value.Filter.SumPrice)">
+                                <input class="form-check-input" type="checkbox" id="@string.Format("{0}{1}",(int)item.CategoryType,food.Index)">
+                                <label class="form-check-label" for="@string.Format("{0}{1}",(int)item.CategoryType,food.Index)">
+                                    @food.Value.Name
+                                </label>
+                                <label> <strong>цена: </strong>@food.Value.Filter.SumPrice</label>
+                            </div>
+                            @if (@food.Value.Filter.MaxCount > 1)
+                            {
+                                <div class="form-group row">
+                                    <label for="@string.Format("id{0}{1}",(int)item.CategoryType,food.Index)" class="col-5 col-sm-7 col-md-8 col-lg-4">количество</label>
+                                    <div class="col-8 col-sm-5 col-md-4 col-lg-3">
+                                        <input id="@string.Format("id{0}{1}",(int)item.CategoryType,food.Index)" type="number" class="form-control " value="1" min="1" max="@food.Value.Filter.MaxCount" />
+                                    </div>
+                                </div>
+                            }
+                        </div>}
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<div class="container">
+    <div class="row" style="display:flex;justify-content:center">
+        <div style="margin-right:1vw">
+            <button id="btn" class="btn btn-info">Выдать</button>
+        </div>
+        <div>
+            <input type="text" id="price" class="form-control" placeholder="укажите продукты" readonly="readonly" />
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+
+        function CalcSum() {
+            var sum = 0;
+            $.each($("input[type='checkbox']"), function (i, el) {
+                try {
+                    if ($(el).is(':checked')) {
+                        var $parent = $(el).parent('div');
+                        if (parseInt($parent.data('max')) > 1) {
+                            var val = parseInt($parent.parent("div.row").find("input[type='number']:first").val());
+                            if (val > 0) {
+                                sum += parseInt($(el).parent('div').data('money')) * val
+                            }
+                        }
+                        else {
+                            sum += parseInt($(el).parent('div').data('money'));
+                        }
+                    }
+                } catch { }
+            });
+            sum == 0 ? $("#price").val("") : $("#price").val(sum);
+
+        }
+
+
+        $(function () {
+            $(document).on("change", "input[type='checkbox'],input[type='number']", function () {
+                CalcSum();
+            });
+        })
+    </script>
+}

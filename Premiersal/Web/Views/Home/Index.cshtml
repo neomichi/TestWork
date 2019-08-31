@@ -1,0 +1,44 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+@model IEnumerable<Web.Models.Film>
+    <div class="row">
+        <div class="col-md-9">
+            <h1> </h1>
+            <h2>Список киносеансов</h2>
+            <table class="table table-hover table-bordered">
+                <thead>
+                <tr>
+                    <th>Название фильма</th>
+                    <th>Время начала</th>
+                    <th>Число билетов /<br/>свободно</th>
+                    <th>Начало продажи билетов</th>
+                    <th>Окончание продажи билетов</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+             
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Title</td>
+                            <td>@item.Start</td>
+                            <td>@String.Format("{0}/{1}", item.NumPlaces, item.FreeNumPlaces)</td>
+                            <td>@item.OrderStart</td>
+                            <td>@item.OrderEnd</td>
+                            <td><a class="btn btn-info" href="@Url.Action("AddOrEditFilm",new {filmid= item.Id })">Изменить</a></td>
+                            <td><a class="btn btn-danger" href="@Url.Action("Delete",new {id= item.Id })">Удалить</a></td>
+                        </tr>
+                    }
+          
+
+                </tbody>
+
+            </table>
+            
+
+            <a class="btn btn-info" href="@Url.Action("AddOrEditFilm","Home")">Добавить сеанс</a>
+        </div>
+    </div>

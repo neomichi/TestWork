@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zoozoo", "zoozoo\zoozoo.csproj", "{047D27D2-B5A2-403F-9157-28E9EB25B975}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WcfService", "WcfService\WcfService.csproj", "{D48190DB-AA3D-4E59-A223-0874806EF589}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zoozoo.Core", "zoozoo.Core\zoozoo.Core.csproj", "{713C90C6-66A3-431D-87F8-E68BECF00CD5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{047D27D2-B5A2-403F-9157-28E9EB25B975}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{047D27D2-B5A2-403F-9157-28E9EB25B975}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{047D27D2-B5A2-403F-9157-28E9EB25B975}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{047D27D2-B5A2-403F-9157-28E9EB25B975}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D48190DB-AA3D-4E59-A223-0874806EF589}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D48190DB-AA3D-4E59-A223-0874806EF589}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D48190DB-AA3D-4E59-A223-0874806EF589}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D48190DB-AA3D-4E59-A223-0874806EF589}.Release|Any CPU.Build.0 = Release|Any CPU
+		{713C90C6-66A3-431D-87F8-E68BECF00CD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{713C90C6-66A3-431D-87F8-E68BECF00CD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{713C90C6-66A3-431D-87F8-E68BECF00CD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{713C90C6-66A3-431D-87F8-E68BECF00CD5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

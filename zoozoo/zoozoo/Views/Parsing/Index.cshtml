@@ -1,0 +1,85 @@
+﻿@{
+    ViewBag.Title = "парсер";
+}
+@using zoozoo.Code
+@model zoozoo.Models.ParserStateView
+
+<div class="bg-info" style="padding: 10px;">
+    <h4 id="h4"></h4>
+     @if (!Model.IsWork)
+    {
+    <button class="btn btn-default" id="start" onclick="Run(this,'@Url.Action("Start", "Parsing")');">Начать</button>
+    <ul id="descr"></ul>
+    }
+    <button class="btn btn-info" onclick="callme('@Url.Action("Info","Parsing")');">обновить</button>
+
+</div>
+
+
+<h4>лог</h4>
+<ul id="gg">
+    @foreach (var item in Model.Info)
+    {
+        <li>@item</li>
+    }
+</ul>
+
+
+@*<button class="btn btn-info" onclick="refresh('@Url.Action("GetState", "Parsing")')">Узнать сколько обьявлений</button>*@
+
+
+
+
+@section scripts
+{
+    <script type="text/javascript">
+
+
+        function Run(el, url) {
+            $(el).attr('disabled', 'disabled');
+            $('#gg').html('');
+            $.ajax({
+                url: url,
+                dataType: 'json',
+                success: function(data) {
+
+                    $.each(data.Info, function(index, value) {
+                        $("#gg").append('<li>' + index + ') ' + value + '</li>');
+                    });
+                },
+                error: function() {
+                    alert("ошибка");
+                },
+                complete: function() {
+                    $(el).removeAttr("disabled");
+                }
+            });
+        }
+
+        function callme( url) {
+
+        
+                $.ajax({
+                    url: url,
+                    dataType: 'json',
+                    success: function(data) {
+                        $('#gg').html('');
+                        //var dt=$.parseJSON(data);
+                        $.each(data, function(index, value) {
+                            $("#gg").append('<li>' + index + ') ' + value + '</li>');
+                        });
+                    },
+                    error: function() {
+
+                    },
+                    complete: function() {
+
+                    }
+                });
+            
+
+        }
+
+
+    </script>
+}

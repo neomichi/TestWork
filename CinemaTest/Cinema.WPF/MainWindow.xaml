@@ -1,0 +1,45 @@
+﻿<Window x:Class="Cinema.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Cinema.WPF"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="400" Width="600">
+    <Grid ShowGridLines="True">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="40"></RowDefinition>            
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition> 
+        </Grid.ColumnDefinitions>
+        <Button Grid.Row="2" Grid.Column="0" x:Name="button" Content="Обновить" HorizontalAlignment="Left" Margin="10,0,0,0" Width="75" Height="35" Click="button_Click"/>
+        <DataGrid Grid.Row="1" Grid.Column="0" IsReadOnly="True" x:Name="dataGrid" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Height="auto" Width="auto" AutoGenerateColumns="False" MouseDoubleClick="DataRow_MouseDoubleClick">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Path=Id}" Visibility="Hidden"></DataGridTextColumn>
+                <DataGridTextColumn Header="Название" Width="4*" 
+                             Binding="{Binding Path=Title}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Начало фильма" Width="3*"
+                             Binding="{Binding Path=Start,StringFormat={}{0:dd.MM.yyyy hh:mm}}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Число свободных мест" Width="2*" 
+                             Binding="{Binding Path=FreePlaces}"></DataGridTextColumn>
+                <DataGridTemplateColumn Header="Купить билеты" Width="2.3*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+
+                            <Button Click="ShowHideDetails" Tag="{Binding .}"
+                                    
+                                    Content="купить билет"                                     
+                                    Command="{Binding showModal}"                                    
+                                    CommandParameter="{Binding Path=Id}">  
+                                </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+            
+        </DataGrid>        
+    </Grid>
+</Window>

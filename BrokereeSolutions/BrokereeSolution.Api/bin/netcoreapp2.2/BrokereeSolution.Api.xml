@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BrokereeSolution.Api</name>
+    </assembly>
+    <members>
+        <member name="M:BrokereeSolution.Api.Controllers.ItemController.#ctor(BrokereeSolution.Data.Repository.IItemRepository)">
+            <summary>
+             конструктор
+            </summary>
+            <param name="itemRepository"></param>
+        </member>
+        <member name="M:BrokereeSolution.Api.Controllers.ItemController.GetAll">
+            <summary>
+            Получить список всех items
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BrokereeSolution.Api.Controllers.ItemController.GetById(System.Int32)">
+            <summary>
+            Получить по id 
+            </summary>
+            <param name="id">id item</param>
+            <returns></returns>
+        </member>
+        <member name="M:BrokereeSolution.Api.Controllers.ItemController.GetByMany(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Получить подстроку ресурса по индексу начала и длине подстроки
+            </summary>
+            <param name="id">идентификатор</param>
+            <param name="start">индекс начала</param>
+            <param name="length">длина подстроки</param>
+            <returns></returns>
+        </member>
+        <member name="M:BrokereeSolution.Api.Controllers.ItemController.Post(BrokereeSolution.Data.Model.Item)">
+            <summary>
+             создать item 
+            </summary>
+            <param name="value">{id,text}</param>
+            <returns></returns>
+        </member>
+        <member name="M:BrokereeSolution.Api.Controllers.ItemController.Put(BrokereeSolution.Data.ViewModel.ItemView)">
+             <remarks>
+             Получить подстроку ресурса по индексу начала и длине подстроки<br/>
+             - Вставка подстроки<br/>
+              - в начало<br/>
+              - в конец<br/>
+              - в любое место по индексу<br/>
+                 - Удаление подстроки по индексу и длине<br/>
+                 - Замена подстроки на другую      
+            
+             описание ActionType:
+             10: Перезаписать ресурс
+             20: Вставка подстроки - в начало       
+             30: Вставка подстроки - в конец        
+             40: Вставка подстроки - в любое место по индексу             
+             50: Удаление подстроки по индексу и длине           
+             60: Замена подстроки на другую     
+             </remarks>
+               <summary>  </summary>
+             <param name="itemView"> 
+             <param name="Id">идентификатор</param>
+             <param name="Text">значение</param>
+             <param name="Index">индекс</param>
+             <param name="Length">длина под строки(для метода DeleteSub)</param>
+             <param name="ActionType">тип действия</param> 
+             
+             </param>
+             <returns></returns>
+        </member>
+        <member name="M:BrokereeSolution.Api.Controllers.ItemController.Delete(System.Int32)">
+            <summary>
+            Удалить item
+            </summary>
+            <param name="id">идентификатор</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

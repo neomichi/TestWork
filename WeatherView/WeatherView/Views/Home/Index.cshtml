@@ -1,0 +1,138 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+@model  int
+<div class="container-fluid" ng-controller="weatherCtrl">
+    <div class="row">
+        <div class="col-xs-12 col-md-7">
+            <h2>Просмотр погоды для городов</h2>
+
+
+            <div id="{{city.Name}}" class="panel panel-primary " ng-repeat="city in cities.Cities">
+                <div class="panel-body">
+                    в городе <span>{{city.Name}} </span><a ng-click="removeCity(city.Name)" class="btn btn-danger">Удалить</a>
+                </div>
+                <div ng-show="isShow(city.Name)" class="panel-footer">
+
+                    <table class="table table-bordered table-hover">
+                        <tr>
+                            <th>источник</th>
+                            <th>температура</th>
+                            <th>давление</th>
+                            <th>влажность</th>
+                        </tr>
+                        <tr ng-repeat="w in city.Weathers">
+                            <th>{{w.SourceName}}</th>
+                            <th>{{w.Temp}}</th>
+                            <th>{{w.Humidity}}</th>
+                            <th>{{w.Pressure}}</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+
+
+            <div class="alert alert-info" role="alert">
+                <h4>Добавить город</h4>
+                <form ng-submit="addcitysubmit()" class="form-horizontal">
+                    <div class="form-group">
+                        <label for="cityname" class="col-sm-3 control-label">Название города</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" ng-model="addcity" id="cityname" name="cityname" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-10">
+                            <button type="submit" class="btn btn-default">Добавить </button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts
+{
+
+    <script type="text/javascript">
+
+        var app = angular.module("myApp", []);
+
+
+        app.controller("weatherCtrl", function ($scope, $q, $http) {
+
+            $http.get("/test/GetCities").success(function(data) {
+                angular.copy(data, cities);
+            });
+            var cities = [];
+            $scope.cities = cities;
+
+            $scope.$watchCollection('cities.Cities', function(newNames, oldNames) {
+
+                if (typeof cities.Cities !== 'undefined' && cities.Cities.length > 0) {
+
+                    angular.forEach(cities.Cities, function(value, key) {
+
+                       var cityname = cities.Cities[key].Name;
+
+                       var val1 = $http.get('/test/getweather1', { params: { city: cityname },cache: false});
+                       var val2 = $http.get('/test/getweather2',{ params: { city: cityname },cache:false});
+
+                       $q.all([val1, val2]).then(function (values) {
+                           //console.log('---');
+                           //console.log(values[0].data);
+                           //console.log(values[1].data);
+                           cities.Cities[key].Weathers = [];
+                           cities.Cities[key].Weathers.push(values[0].data);
+                           cities.Cities[key].Weathers.push(values[1].data);
+                       });
+                    });
+                }
+            });
+
+
+            $scope.isShow = function(selectCity) {
+
+                angular.forEach(cities.Cities, function (value, key) {
+
+                    if (cities.Cities[key].Name.toLowerCase() == selectCity.toLowerCase() &&
+                        typeof cities.Cities[key].Weathers !== 'undefined' &&
+                        cities.Cities[key].Weathers!=null &&
+                        cities.Cities[key].Weathers.length > 1) {
+                        return false;
+                    }
+                });
+                return true;
+            };
+
+            $scope.removeCity = function(city) {
+                var el = $("div#" + city);
+
+                $http.get("/test/Remove", {
+                    params: { cityname: city }
+                }).success(function(data) {
+                    el.remove();
+                });
+            }
+
+            $scope.addcity = "";
+            $scope.addcitysubmit = function() {
+                var text = $scope.addcity;
+                $http.get("/test/Add", {
+                    params: { cityname: text }
+                }).success(function(data) {
+                    cities.Cities.push({ Name: text });
+                });
+                $scope.addcity = '';
+            };
+
+
+        });
+    </script>
+
+}

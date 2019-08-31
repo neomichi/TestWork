@@ -1,0 +1,93 @@
+﻿@{
+    ViewBag.Title = " ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model IEnumerable<Raskadrovka.Models.ImgFile>
+
+<div class="row" style="margin-top: 25px">
+    <div class="thumbnail">
+        @foreach (var img in Model)
+        {
+
+            <img src="@img.Name"
+             
+                 title="@String.Format("ширина: {0} высота: {1}", img.W, img.H)"/>
+
+        }
+    </div>
+    <div class="clear"></div>
+    <div>
+        <form class="form-inline">
+            <div class="form-group">
+                <label for="width">Укажите ширину </label>
+                <input name="width" type="text" class="form-control" id="width" placeholder="укажите число" />
+            </div>
+            <button onclick="return GetNewImages(this);" class="btn btn-default">Выполнить</button>
+        </form>
+    </div>
+<div  class="clear"></div>
+
+
+<div id="final" class="thumbnail">
+
+
+</div>
+
+
+</div>
+
+@section scripts
+{
+    <script type="text/javascript">
+
+
+        function GetNewImages(e) {
+            $(e).addClass('disabled');
+     
+            var w = $("#width").val();
+            var re = /\d+/;
+       
+            if (re.test(w)) {
+
+                $.getJSON("@Url.Action("GetImgList", "Home")", { width: w })
+                    .done(function (json) {
+                        alert("готово");
+                        $("#final").html('');
+
+                        $.each(json, function (index, img) {
+                            var html = '<img src="' + img.Name + '" ' +
+                                ' title="ширина:' + img.W + ' высота: ' + img.H + '"'+
+                                ' style="height:' + img.H + 'px;width:' + img.W + 'px"'+
+                                ' />';
+                          $("#final").append(html);
+                        });
+
+                        var table = '<div><table class="table table-hover">' +
+                            '<thead><tr><th>имя</th><th>ширина</th><th>высота</th></tr></thead><tbody>';
+
+                        $.each(json, function (index, img) {
+                            table+='<tr> <td>' + img.Name + '</td><td>' + img.W + '</td><td>' + img.H + '</td></tr>';
+
+                        });
+                         table+='</tbody></table></div>';
+                         $("#final").append(table);
+                        console.log(json);
+                    })
+                    .fail(function() {
+                        alert("ошибка");
+                    })
+                    .always(function () {
+                        $(e).removeClass('disabled');
+                });
+
+             
+
+            } else {
+                alert("укажите число");
+            }
+            return false;
+        }
+
+
+    </script>
+}

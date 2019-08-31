@@ -1,0 +1,52 @@
+﻿@model IEnumerable<Cinema.Data.Models.Seance>
+
+@{
+    ViewBag.Title = "Все Сеансы";
+}
+
+<h2>Все Сеансы</h2>
+
+<p>
+    @Html.ActionLink("Добавить", "Create",null,new { @class = "btn btn-info" })
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Title)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Start)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.QuantityPlaces)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.OccupiedPlace)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Title)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Start)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.QuantityPlaces)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.OccupiedPlace)
+        </td>
+
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+            @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+        </td>
+    </tr>
+}
+
+</table>
