@@ -8,6 +8,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using EasyHttp.Http;
 using HtmlAgilityPack;
 using Motiv.Data.Model;
 
@@ -16,10 +17,10 @@ namespace Motiv.Data
     public class Ballance : IBallance
     {
         CookieContainer cookieContainer;
-
+        CookieCollection cookieCollection;
         IAuthData authData;
         Subscription subscriptions { get; set; }
-
+        HttpClient httpClient;
         /// <summary>
         /// делегат
         /// </summary>
@@ -32,6 +33,10 @@ namespace Motiv.Data
         public Ballance()
         {
             cookieContainer=new CookieContainer();
+
+            cookieCollection = new CookieCollection();
+
+            httpClient = new HttpClient();
         }
 
   
@@ -69,42 +74,61 @@ namespace Motiv.Data
             return string.Format("{0:0.0000} {1}", val, trafficUnit);
         }
 
-        static string WebQuery(string url,CookieContainer cc, string postData = "", bool AddCookie = false)
-        {
-            var request = (HttpWebRequest)HttpWebRequest.Create(url);
-            ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(AcceptAllCertifications);
-            request.Timeout = 5000;
-            request.ContentType = "application/x-www-form-urlencoded";
-            request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36 OPR/46.0.2597.39";
-            request.CookieContainer = cc;
-            if (!string.IsNullOrEmpty(postData))
+        string HttpClient(string url,string postData = "")
+        { 
+            HttpResponse httpResponse;
+            
+            if (string.IsNullOrWhiteSpace(postData))
             {
-                var data = Encoding.UTF8.GetBytes(postData);
-                request.ContentLength = data.Length;
-                request.Method = "POST";
-                using (var stream = request.GetRequestStream())
-                {
-                    stream.Write(data, 0, data.Length);
-                }
-            }
+                httpResponse = httpClient.Get(url);
+                cookieCollection = httpResponse.Cookies;
+                return httpResponse.RawText;
 
-            var response = request.GetResponse();
-            if (response == null)
+            } else
             {
-                throw new WebException("Нет ответа");
+                httpClient.Request.Cookies = cookieCollection;
+                httpClient.Request.Host = "lisa.motivtelecom.ru";
+                httpResponse = httpClient.Post(url, postData, "application/x-www-form-urlencoded");
             }
-            else if (AddCookie)
-            {                
-                cc.Add(((HttpWebResponse)response).Cookies);
-            }
-            using (var stream = ((HttpWebResponse)response).GetResponseStream())
-            {
-                using (var streamReader = new StreamReader(stream, true))
-                {
-                    return streamReader.ReadToEnd();
-                }
-            }
+            return httpResponse.RawText;
         }
+        //[Obsolete]
+        //static string WebQuery(string url,CookieContainer cc, string postData = "", bool AddCookie = false)
+        //{
+        //    var request = (HttpWebRequest)HttpWebRequest.Create(url);
+        //    ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(AcceptAllCertifications);
+        //    request.Timeout = 5000;
+        //    request.ContentType = "application/x-www-form-urlencoded";
+        //    //request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36 OPR/46.0.2597.39";
+        //    request.CookieContainer = cc;
+        //    if (!string.IsNullOrEmpty(postData))
+        //    {
+        //        var data = Encoding.UTF8.GetBytes(postData);
+        //        request.ContentLength = data.Length;
+        //        request.Method = "POST";
+        //        using (var stream = request.GetRequestStream())
+        //        {
+        //            stream.Write(data, 0, data.Length);
+        //        }
+        //    }
+
+        //    var response = request.GetResponse();
+        //    if (response == null)
+        //    {
+        //        throw new WebException("Нет ответа");
+        //    }
+        //    else if (AddCookie)
+        //    {                
+        //        cc.Add(((HttpWebResponse)response).Cookies);
+        //    }
+        //    using (var stream = ((HttpWebResponse)response).GetResponseStream())
+        //    {
+        //        using (var streamReader = new StreamReader(stream, true))
+        //        {
+        //            return streamReader.ReadToEnd();
+        //        }
+        //    }
+        //}
 
         //ssl
         static bool AcceptAllCertifications(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certification, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
@@ -128,107 +152,101 @@ namespace Motiv.Data
            
             var optionsList = new List<Option>();
             var dateTimeList = new List<DateTime>();
-            var subscription = new Subscription();
-            double freeTraffic = 0;
+            var subscription = new Subscription();            
             var doc = new HtmlDocument();
             doc.LoadHtml(rawHtml);
             var alltr = doc.DocumentNode.Descendants("tr");
-            var table = doc.DocumentNode.Descendants("table")
-                .Where(x =>
-                FindText(x, "Интернет")
-                && FindText(x, "Остаток")
-                && FindText(x, "Срок действия")).FirstOrDefault();
+           var divUserInfo = doc.DocumentNode.Descendants("div").FirstOrDefault(x => x.Attributes.Contains("id") &&
+            x.Attributes["id"].Value.Equals("userinfo"));
 
-            if (table == null)
+            var divAll = doc.DocumentNode.Descendants("div").FirstOrDefault(x => x.Attributes.Contains("id") &&
+        x.Attributes["id"].Value.Equals("all"));
+
+
+            if (divUserInfo == null || divAll == null)
             {
                 throw new Exception("page not found");
             }
 
 
-            var ballance = doc.DocumentNode.Descendants("tr")
-                .FirstOrDefault(x => x.InnerText.Contains("Баланс:"));
-               
-            if (ballance!=null)
+            //var trD = divAll.Descendants("tr").ToList();
+            //var tddList = trD.SelectMany(x => x.Descendants("td")
+            //.Select(y => y.InnerText.Trim()).ToList()).ToList();
+
+            //var output = Enumerable.Range(0, tddList.Count / 2)
+            //           .Select(i => Tuple.Create(tddList[i * 2], tddList[i * 2 + 1]))
+            //           .ToList();
+
+
+            var aditionProps = Helper.GetParams(divAll);
+            var mainProps= Helper.GetParams(divUserInfo);
+
+
+
+
+
+
+
+            //var table = doc.DocumentNode.Descendants("table")
+            //    .Where(x =>
+            //    FindText(x, "Интернет")
+            //    && FindText(x, "Остаток")
+            //    && FindText(x, "Срок действия")).FirstOrDefault();
+
+            //if (table == null)
+            //{
+            //    throw new Exception("page not found");
+            //}
+          
+            subscription.Ballance = mainProps.First(x => x.Item1
+           .IndexOf("Баланс", StringComparison.OrdinalIgnoreCase) > -1).Item2;
+
+            subscription.Tariff= mainProps.First(x => x.Item1
+             .IndexOf("Тарификация", StringComparison.OrdinalIgnoreCase) > -1).Item2;
+
+
+
+
+
+
+            subscription.End = DateTime.MinValue;
+
+
+
+
+            decimal traffic = 0;
+
+            foreach (var tr in aditionProps)
             {
-                subscription.Ballance = Regex.Match(ballance.InnerText, Constant.RegexDouble).Value.Trim()+"р";              
-                    
-            }
+                var row = tr.Item1 + tr.Item2;
+                var regexValue = Regex.Match(row, Helper.RegexDoubleCost);
+                var regexDate = Regex.Match(row, Helper.RegexDt);
 
-
-
-            var listTr = table.Descendants("tr");
-
-            var trTitle = alltr.FirstOrDefault(x => x.InnerText.IndexOf("Тарификация:") > -1);
-            if (trTitle!=null)
-            {
-                subscription.Tariff = trTitle.Descendants("td")
-                     .Select(x => x.InnerText.Trim()).ToList()[1];                
-            }
-
-            
-
-            var listTrFilter = listTr.Where(x => x.InnerText.Contains(authData.Tarif)
-            || x.InnerText.Contains(authData.Option)).ToList();
-
-           
-            foreach (var tr in listTrFilter)
-            {
-
-                var customDateTimeList = new List<DateTime>();
-
-                var tdList = tr.Descendants("td").Select(x => string.IsNullOrEmpty(x.InnerText) ? "" :
-                x.InnerText.Trim().Replace("\r\n", string.Empty)).ToList();
-
-                foreach (Match date in Regex.Matches(tdList[2], Constant.RegexDateTime))
-                {
-                    customDateTimeList.Add(DateTime.Parse(date.Groups[1].Value));
-                }
-                var regexValue = Regex.Match(tdList[1], Constant.RegexDoubleCost);
                 if (regexValue.Success && regexValue.Groups.Count > 2)
                 {
-                  
-                    var row = regexValue.Groups[3].Value.Trim();
-
-                   // var coaf = 1;
-
-
-                    if (row.Equals("GB", StringComparison.OrdinalIgnoreCase))
-                        freeTraffic += Double.Parse(regexValue.Groups[1].Value, CultureInfo.InvariantCulture) * 1024 * 1024;
-                    if (row.Equals("MB", StringComparison.OrdinalIgnoreCase))
-                        freeTraffic += Double.Parse(regexValue.Groups[1].Value, CultureInfo.InvariantCulture) * 1024;
-
-                   // coaf *= 1024;
-                    /*if (row.Equals("B", StringComparison.OrdinalIgnoreCase)) coaf *= 1;*/
-
-
-
-                    dateTimeList.AddRange(customDateTimeList);
+                    var unit = regexValue.Groups[3].Value.Trim().ToUpper();
+                    var val= regexValue.Groups[1].Value.Trim();                   
+                    traffic += Helper.GetUnitValueToByte(unit, val);
                 }
-                else
+
+                if (regexDate.Success)
                 {
-                    var option = new Option()
+                    var date = DateTime.Parse(regexDate.Value);
+                    if (subscription.End < date)
                     {
-                        End = customDateTimeList.Max(x => x),
-                    };
-                    subscription.Options = new List<Option> { option };
+                        subscription.End = date;
+                        subscription.Start=date.AddDays(-30);
+                    }
+
                 }
-
             }
-        
-
-            subscription.Start = dateTimeList.Min(x => x);
-            subscription.End = dateTimeList.Max(x => x);
-
-            if (subscription.End.Value - subscription.Start.Value < TimeSpan.FromHours(1))
-                subscription.Start = subscription.Start.Value.AddDays(-30);
-
-
-            subscription.FreeTraffic = ToStringCalcWithUnit(freeTraffic);           
-          
+     
+           
+            subscription.FreeTraffic = ToStringCalcWithUnit(Decimal.ToDouble(traffic));
 
             var period = (subscription.End.Value - subscription.Start.Value).TotalSeconds;
             var available = (subscription.End.Value - DateTime.Now);
-            subscription.Median = ToStringCalcWithUnit(freeTraffic * available.TotalSeconds / (period));
+            subscription.Median = ToStringCalcWithUnit(Decimal.ToDouble(traffic) * available.TotalSeconds / (period));
 
             subscription.TimeLeft = TimeLeft(available);
 
@@ -243,18 +261,19 @@ namespace Motiv.Data
         string GetHtmlFromCabinetPage(int oneTime, int twoTime)
         {
 
-           
 
-            WebQuery(Constant.Url1, cookieContainer, "", true);
+
+            HttpClient(Helper.Url1,"");
             Thread.Sleep(oneTime);
             Change.Invoke(20);
             var postData = string.Format("logintype={0}&abnum={1}&pass={2}", authData.AuthType, authData.Login, authData.Password);
-        
-            WebQuery(Constant.Url1, cookieContainer, postData);
             Change.Invoke(50);
             Thread.Sleep(twoTime);
+            HttpClient(Helper.Url1, postData);
+            Change.Invoke(60);
+            var a= HttpClient(Helper.Url2);
 
-            return WebQuery(Constant.Url2, cookieContainer, postData); ;
+            return a;
         }
 
 
@@ -265,7 +284,10 @@ namespace Motiv.Data
             Change.Invoke(1);
             authData = auth;
             Change.Invoke(5);
-            var rawHtml = GetHtmlFromCabinetPage(oneTime, twoTime);
+
+            
+            var rawHtml = File.ReadAllText(@"F:\svn\motiv.helper\Motiv.Wpf.Ballance\gg.txt");
+           // var rawHtml =GetHtmlFromCabinetPage(oneTime, twoTime);
             Change.Invoke(70);
        
             var subscription = GetSubscriptionFromHtml(rawHtml);
@@ -286,16 +308,16 @@ namespace Motiv.Data
 
             if (time.TotalMinutes < 60.00)
             {
-                return string.Format("{0} {1}",(int) time.Minutes, Constant.GetStringTime(Constant.TimeRangeEnum.Min, time));
+                return string.Format("{0} {1}",(int) time.Minutes, Helper.GetStringTime(Helper.TimeRangeEnum.Min, time));
             }
             else if (time.TotalDays > 1.0)
             {
-                return string.Format("{0} {1}", (int)time.TotalDays, Constant.GetStringTime(Constant.TimeRangeEnum.Day, time));
+                return string.Format("{0} {1}", (int)time.TotalDays, Helper.GetStringTime(Helper.TimeRangeEnum.Day, time));
 
             }
             else if (time.TotalHours < 24.00)
             {
-                return string.Format("{0} {1}", (int)time.TotalHours, Constant.GetStringTime(Constant.TimeRangeEnum.Hour, time));
+                return string.Format("{0} {1}", (int)time.TotalHours, Helper.GetStringTime(Helper.TimeRangeEnum.Hour, time));
 
             }
             return "";

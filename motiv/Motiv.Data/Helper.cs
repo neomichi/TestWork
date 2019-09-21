@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
+using HtmlAgilityPack;
 
 namespace Motiv.Data
 {
-    public static class Constant
+    public static class Helper
     {
         public  enum TimeRangeEnum
         {
@@ -28,6 +31,7 @@ namespace Motiv.Data
         public const string RegexDateTime = @"(\d{2}.\d{2}.\d{4} \d{2}:\d{2}:\d{2})";
         public const string RegexDoubleCost = @"(-?[0-9]+(\.[0-9]+)?) (GB|MB|B)";
         public const string RegexDouble = @"[0-9]*[.,]?[0-9]+";
+        public const string RegexDt = @"\d{2}.\d{2}.\d{4} (\d\d)(:\d\d){0,2}";
 
         public static string GetStringTime(this TimeRangeEnum range, System.TimeSpan val)
         {
@@ -62,8 +66,6 @@ namespace Motiv.Data
                 case 0: return new string[] { "осталось", "дней", "часов", "минут", "секунд" }[(int)range];
                 default:return "";
             }
-
-
         }
 
         /// <summary>
@@ -74,6 +76,69 @@ namespace Motiv.Data
         public static Double ToDouble(this string value )
         {
             return Double.Parse(value, CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        ///  получить tuple keyvalue
+        /// </summary>
+        /// <param name="div"></param>
+        /// <returns></returns>
+        public static List<Tuple<string,string>> GetParams(HtmlNode div)
+        {
+            var trList = div.Descendants("tr").ToList();
+            var tdList = trList.SelectMany(x => x.Descendants("td")
+            .Select(y => y.InnerText.Trim()).ToList()).ToList();
+
+            return Enumerable.Range(0, tdList.Count / 2)
+                       .Select(i => Tuple.Create(tdList[i * 2], tdList[i * 2 + 1]))
+                       .ToList();
+        }
+
+        /// <summary>
+        /// перевод в байты
+        /// </summary>
+        /// <param name="unit">мера</param>
+        /// <param name="value">значение</param>
+        /// <returns></returns>
+        public static decimal GetUnitValueToByte(string unit,string value)
+        {
+            decimal val = Decimal.Parse(value.Replace(",","."), CultureInfo.InvariantCulture);
+
+            switch (unit)
+            {
+                case "B":break;
+                case "KB": break;
+                case "MB":val = val * 1024;break;
+                case "GB":val = val * 1024 * 1024; break;
+            }
+            return val;
+        }
+
+        /// <summary>
+        /// перевод в понятные еденицы
+        /// </summary>
+        /// <param name="val">значение</param>
+        /// <returns></returns>
+        static string ToStringCalcWithUnit(double val)
+        {
+
+            string trafficUnit = "";
+            if (val > 1024 * 1024)
+            {
+                trafficUnit = "гб";
+                val /= (1024 * 1024);
+            }
+            else if (val > 1024)
+            {
+                trafficUnit = "мб";
+                val /= 1024;
+            }
+            else if (val > 0)
+            {
+                trafficUnit = "кб";
+            }
+
+            return string.Format("{0:0.0000} {1}", val, trafficUnit);
         }
 
     }
